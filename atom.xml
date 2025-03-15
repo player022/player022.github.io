@@ -6,7 +6,7 @@
   <link href="https://player022.github.io/atom.xml" rel="self"/>
   
   <link href="https://player022.github.io/"/>
-  <updated>2024-08-01T01:10:45.875Z</updated>
+  <updated>2025-03-15T11:45:02.690Z</updated>
   <id>https://player022.github.io/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>GBA游戏开发日志（1）</title>
+    <link href="https://player022.github.io/2025/03/15/GBA%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97%EF%BC%881%EF%BC%89/"/>
+    <id>https://player022.github.io/2025/03/15/GBA%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97%EF%BC%881%EF%BC%89/</id>
+    <published>2025-03-15T08:41:39.000Z</published>
+    <updated>2025-03-15T11:45:02.690Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>​        以下是博主一些自言自语的碎碎念，不喜欢请忽略这些。</p><p>​        自从玩过GBA上的一些经典作品比如缩小帽、恶魔城月下之后一直想开发一个GBA的游戏，但之前因为种种原因未能实现，因为大学虽然学的是计算机专业，但是GBA开发使用的比较专业的 <a href="https://github.com/devkitPro/libgba">libgba</a>库对博主来说实在是有点太难了，拼尽全力无法掌握。好在后面发现了另一个比较高级一些的开发库——<a href="(https://github.com/devkitPro/libgba)">butano</a>，这个库对 <a href="https://github.com/devkitPro/libgba">libgba</a>进行了封装和拓展，最重要的是使用C++提供了更高层次的抽象，对于博主这样的编程菜鸟实在是太友好了，而且截至到写这篇博客的时间，作者还在持续对这个库进行更新，相信后面会越来越好。</p><p>​        最初开发其实是24年的暑假，这个个人博客也正是当时新建的，本想着记录开发的过程。可惜一开始的基调定的太高，希望进行一些创新，所以希望使用GBA的<a href="https://zh.wikipedia.org/wiki/Mode_7">mode7</a>模式开发一个RPG游戏，然而mode7涉及到线性代数和比较底层的知识，在遇到一个技术问题以后再也无法推进，只留下了一张绝望的截图。</p><p><img src="/2025/03/15/GBA%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97%EF%BC%881%EF%BC%89/1-1.png"></p><p>​        本来已经是放弃了的，但是寒假期间玩了一款叫<a href="https://stoneshard.com/wiki/Stoneshard_Wiki">紫色晶石(stone shard)</a>的游戏之后又死灰复燃了，因为在玩这个游戏的过程中，感觉并没有特别难实现的内容，完全可以在GBA上复刻一个迷你版。加上寒假有时间，就开始着手写，一直持续到现在。</p><p>​        最开始觉得写博客可能有点矫情，感觉就是在说一些自己的想法和开发经历，其实也没什么营养。而且现在这个信息泛滥的时代，可能根本没人看。不过，后面在开发过程中发现，写开发日志其实是很有必要的。因为代码里的注释只能告诉你“怎么做”，但怎么想的、为什么这么做，注释里是写不出来的。时间一久，尤其是开发中断断续续的，很多当初的思路和设计初衷都容易忘掉。所以，我现在把这个博客当成了我的个人开发日志，如果你正好能喜欢，或者从中获得一点启发，那真是再好不过了，又或者从文中发现我的错误和有更好的提议，也欢迎联系我。</p><h1 id="一、地图"><a href="#一、地图" class="headerlink" title="一、地图"></a>一、地图</h1><p>地图采用了64x64块8x8个像素图块组成，一开始其实有考虑过用16x16的，但<strong>butano背景图块大小只支持8x8的</strong>，而且作者明确表示后续不会加，就是8x8。当然可以通过把四块拼起来变成16x16的，但这也会增加代码的复杂程度，鉴于自己的代码水平最后还是选择了8x8大小的。这样做的坏处是作为一个跳格子的游戏，一格设置为8x8似乎太小了，还有美术素材不是很好找，毕竟8x8能容纳的内容太少了，只能将找到的素材压缩再做一点修改来使用。</p><p><img src="/2025/03/15/GBA%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97%EF%BC%881%EF%BC%89/2-1.png"></p><h1 id="二、玩家"><a href="#二、玩家" class="headerlink" title="二、玩家"></a>二、玩家</h1><p>玩家由几个精灵（sprite）组成，分别是头、身、腿，后面应该还要再添加左右手的可选精灵来显示玩家的装备。最初希望每个人类敌人也都能照这样由几个精灵组成，这样就可以把所有头身体腿的精灵一起导入，然后程序随机组合成各种各样的敌人。但GBA硬件对精灵个数有限制，如果这样一个敌人就要占据5个精灵，还要加上地图上其他的物品，很可能超过这个上限，所以作罢，后面还是老老实实一个一个敌人的画吧。</p><p><img src="/2025/03/15/GBA%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97%EF%BC%881%EF%BC%89/3-1.png"></p><h1 id="三、环境元素"><a href="#三、环境元素" class="headerlink" title="三、环境元素"></a>三、环境元素</h1><p>初步将所有的环境物品分为了三类:没有碰撞体积，可以拾取的：pickup_item; 有碰撞体积，同时可以交互的：interact_item; 有碰撞体积，没有交互的，static_item。从面向对象的角度讲，这三者应该设计一个基类，然后将这三者作为子类拓展，但基于自己的代码水平，还是将它们各自作为一个类来设计。下面简单介绍几个其中的代表：</p><h2 id="1-可拾取物品（pickup-item）"><a href="#1-可拾取物品（pickup-item）" class="headerlink" title="1.可拾取物品（pickup_item）"></a>1.可拾取物品（pickup_item）</h2><p><img src="/2025/03/15/GBA%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97%EF%BC%881%EF%BC%89/4-1.png"></p><p>这是一件装备，因为每格仅有8x8大小的缘故，实在是没法画的更精细了。它没有碰撞体积，玩家可以直接站在上面，在它一格距离内会有文字提示（可交互物品同），按下A后精灵注销，添加进背包的逻辑暂时还没有完善，说实话这是我比较头疼的问题，因为缺乏类似的经验。</p><h2 id="2-可交互物品（interact-item）"><a href="#2-可交互物品（interact-item）" class="headerlink" title="2.可交互物品（interact_item）"></a>2.可交互物品（interact_item）</h2><p><img src="/2025/03/15/GBA%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97%EF%BC%881%EF%BC%89/4-2.png"></p><p><img src="/2025/03/15/GBA%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97%EF%BC%881%EF%BC%89/4-3.png"></p><p>这扇门是交互物品中的典型，它要在玩家按下A以后切换显示的精灵，刚开始的想法是引入两个不同的精灵，然后切换，不过butano中引入精灵可以直接将多个精灵放在一起，然后切换索引来实现这个效果，这个方法应该更加高效。</p><h2 id="3-固定物品（static-item）"><a href="#3-固定物品（static-item）" class="headerlink" title="3.固定物品（static_item）"></a>3.固定物品（static_item）</h2><p>上面图片中的木屋就是固定物品，它在初始化时会将自己所占的地图格子全部变成不可通行，同时由于比较大，它可能需要多个精灵拼成，<strong>butano单个精灵的最大尺寸是64x64</strong>，上面的木屋就是由上下两个精灵组成，同时门也是一个精灵，所以上面说的每个人类由5个精灵组成更加不可能实现了。</p><p>下面的树也是由两个精灵组成，这里有一个问题，太大的精灵会挡住玩家的视野，目前想到的解决方法是靠近到一定距离时隐藏其中一个精灵，比如隐藏树冠，这样就能看到了。</p><p><img src="/2025/03/15/GBA%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97%EF%BC%881%EF%BC%89/4-4.png"></p><h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><p>第一次写这样的日志，感觉没有什么条理，想到哪写到哪，而且写下来才发现，开发了那么久能拿出来的东西实在太少了，后面开发的进度需要快一些了。如果你能看到这里，谢谢你，也欢迎你下载体验我现在还不完善的作品<a href="https://github.com/player022/Iron_and_Sorcery.git">Iron and Sorcery</a>。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;引言&quot;&gt;&lt;a href=&quot;#引言&quot; class=&quot;headerlink&quot; title=&quot;引言&quot;&gt;&lt;/a&gt;引言&lt;/h1&gt;&lt;p&gt;​        以下是博主一些自言自语的碎碎念，不喜欢请忽略这些。&lt;/p&gt;
+&lt;p&gt;​        自从玩过GBA上的一些经典作品比如缩小</summary>
+      
+    
+    
+    
+    
+    <category term="开发日志" scheme="https://player022.github.io/tags/%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97/"/>
+    
+  </entry>
   
   <entry>
     <title>新开始</title>
