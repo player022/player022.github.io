@@ -3,11 +3,11 @@
   <title>阿梁的杂物间</title>
   
   
-  <link href="http://example.com/atom.xml" rel="self"/>
+  <link href="https://player022.github.io/atom.xml" rel="self"/>
   
-  <link href="http://example.com/"/>
+  <link href="https://player022.github.io/"/>
   <updated>2024-08-01T01:10:45.875Z</updated>
-  <id>http://example.com/</id>
+  <id>https://player022.github.io/</id>
   
   <author>
     <name>阿梁</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>新开始</title>
-    <link href="http://example.com/2024/08/01/%E6%96%B0%E5%BC%80%E5%A7%8B/"/>
-    <id>http://example.com/2024/08/01/%E6%96%B0%E5%BC%80%E5%A7%8B/</id>
+    <link href="https://player022.github.io/2024/08/01/%E6%96%B0%E5%BC%80%E5%A7%8B/"/>
+    <id>https://player022.github.io/2024/08/01/%E6%96%B0%E5%BC%80%E5%A7%8B/</id>
     <published>2024-08-01T01:06:25.000Z</published>
     <updated>2024-08-01T01:10:45.875Z</updated>
     
@@ -39,8 +39,8 @@
   
   <entry>
     <title>Hello World</title>
-    <link href="http://example.com/2024/07/26/hello-world/"/>
-    <id>http://example.com/2024/07/26/hello-world/</id>
+    <link href="https://player022.github.io/2024/07/26/hello-world/"/>
+    <id>https://player022.github.io/2024/07/26/hello-world/</id>
     <published>2024-07-26T06:46:18.936Z</published>
     <updated>2024-07-26T06:46:18.936Z</updated>
     
